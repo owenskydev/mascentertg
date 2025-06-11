@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.keyboards import main_menu_keyboard, back_button_keyboard
+from bot.keyboards import main_menu_keyboard, back_button_keyboard, catalog_categories_keyboard
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
@@ -14,7 +14,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = query.data
 
     if data == 'catalog':
-        text = "Здесь будет каталог товаров."
+        text = "Выберите категорию товаров:"
+        reply_markup = catalog_categories_keyboard()
+
+    elif data in ['category_1', 'category_2', 'category_3']:
+        text = f"Заглушка: вы выбрали {data.replace('_', ' ').capitalize()}"
         reply_markup = back_button_keyboard()
 
     elif data == 'order':
