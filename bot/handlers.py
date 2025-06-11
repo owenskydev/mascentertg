@@ -1,6 +1,12 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from bot.keyboards import main_menu_keyboard, back_button_keyboard, catalog_categories_keyboard
+from bot.keyboards import (
+    main_menu_keyboard,
+    back_button_keyboard,
+    catalog_categories_keyboard,
+    category_products_keyboard,
+    get_product_name,
+)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
@@ -17,9 +23,18 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = "Выберите категорию товаров:"
         reply_markup = catalog_categories_keyboard()
 
-    elif data in ['category_1', 'category_2', 'category_3']:
-        text = f"Заглушка: вы выбрали {data.replace('_', ' ').capitalize()}"
+    elif data.startswith("category_"):
+        text = "Выберите товар:"
+        reply_markup = category_products_keyboard(data)
+
+    elif data.startswith("product_"):
+        product_name = get_product_name(data)
+        text = f"<b>{product_name}</b>\nИнформация пока недоступна, будет позже."
         reply_markup = back_button_keyboard()
+
+    elif data == 'back_to_categories':
+        text = "Выберите категорию товаров:"
+        reply_markup = catalog_categories_keyboard()
 
     elif data == 'order':
         text = "Здесь оформление заказа."
@@ -35,8 +50,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Продукция производится в России и на ведущих фабриках мира, известных в своей отрасли."
         )
         reply_markup = back_button_keyboard()
-        await query.edit_message_text(text, reply_markup=reply_markup, parse_mode="HTML")
-        return
 
     elif data == 'back':
         text = "Привет! Выбери действие ниже:"
@@ -46,4 +59,4 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = "Неизвестная команда."
         reply_markup = back_button_keyboard()
 
-    await query.edit_message_text(text, reply_markup=reply_markup)
+    await query.edit_message_text(text, reply_markup=reply_markup, parse_mode="HTML")
